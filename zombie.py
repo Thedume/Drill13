@@ -92,11 +92,11 @@ class Zombie:
         distance2 = (x1 - x2) ** 2 + (y1 - y2) * 2
         return distance2 < (PIXEL_PER_METER * r) ** 2
 
-    def move_slightly_to(self, tx, ty, dir=1):
+    def move_slightly_to(self, tx, ty):
         self.dir = math.atan2(ty - self.y, tx - self.x)
         self.speed = RUN_SPEED_PPS
-        self.x += dir*self.speed * math.cos(self.dir) * game_framework.frame_time
-        self.y += dir*self.speed * math.sin(self.dir) * game_framework.frame_time
+        self.x += self.speed * math.cos(self.dir) * game_framework.frame_time
+        self.y += self.speed * math.sin(self.dir) * game_framework.frame_time
 
     def move_to(self, r=0.5):
         self.state = 'Walk'
@@ -120,7 +120,7 @@ class Zombie:
         if play_mode.boy.ball_count <= self.ball_count:
             return BehaviorTree.SUCCESS
         else:
-            print("many")
+            self.runaway_boy()
             return BehaviorTree.FAIL
 
     def move_to_boy(self, r=0.5):
@@ -131,9 +131,9 @@ class Zombie:
         else:
             return BehaviorTree.RUNNING
 
-    def runaway_boy(self, distance):
-        self.move_slightly_to(play_mode.boy.x+10, play_mode.boy.y)
-        return BehaviorTree.SUCCESS
+    def runaway_boy(self):
+        self.move_slightly_to(1280 - 100, 1000 - 100)
+        #return BehaviorTree.SUCCESS
 
     def get_patrol_location(self):
         self.tx, self.ty = self.patrol_locations[self.loc_no]
