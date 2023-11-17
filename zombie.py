@@ -132,7 +132,8 @@ class Zombie:
             return BehaviorTree.RUNNING
 
     def runaway_boy(self, distance):
-        self.move_slightly_to(play_mode.boy.x, play_mode.boy.y)
+        self.move_slightly_to(play_mode.boy.x+10, play_mode.boy.y)
+        return BehaviorTree.SUCCESS
 
     def get_patrol_location(self):
         self.tx, self.ty = self.patrol_locations[self.loc_no]
@@ -151,8 +152,9 @@ class Zombie:
         SEQ_wander = Sequence('Wander', a3, a2)
 
         c1 = Condition('소년이 근처에 있는가', self.is_boy_nearby, 7)
-        c2 = Condition('좀비의 공 개수 소년의 공 개수보다 많은가', self.is_ball_many)
+        c2 = Condition('좀비의 공 개수가 소년의 공 개수보다 많은가', self.is_ball_many)
         a4 = Action('소년으로 이동', self.move_to_boy)
+        #a6 = Action('소년한테 도망감', self.runaway_boy)
 
         SEQ_chase_boy = Sequence('소년을 추적', c1, c2, a4)
 
