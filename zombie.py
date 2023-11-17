@@ -120,10 +120,9 @@ class Zombie:
         if play_mode.boy.ball_count <= self.ball_count:
             return BehaviorTree.SUCCESS
         else:
-            self.runaway_boy()
             return BehaviorTree.FAIL
 
-    def move_to_boy(self, r=0.5):
+    def move_to_boy(self, r=0.5, d=0):
         self.state = 'Walk'
         self.move_slightly_to(play_mode.boy.x, play_mode.boy.y)
         if self.distance_less_than(play_mode.boy.x, play_mode.boy.y, self.x, self.y, r):
@@ -133,7 +132,7 @@ class Zombie:
 
     def runaway_boy(self):
         self.move_slightly_to(1280 - 100, 1000 - 100)
-        #return BehaviorTree.SUCCESS
+        return BehaviorTree.SUCCESS
 
     def get_patrol_location(self):
         self.tx, self.ty = self.patrol_locations[self.loc_no]
@@ -154,17 +153,19 @@ class Zombie:
         c1 = Condition('소년이 근처에 있는가', self.is_boy_nearby, 7)
         c2 = Condition('좀비의 공 개수가 소년의 공 개수보다 많은가', self.is_ball_many)
         a4 = Action('소년으로 이동', self.move_to_boy)
-        #a6 = Action('소년한테 도망감', self.runaway_boy)
+        a6 = Action('소년한테 도망감', self.runaway_boy)
 
         SEQ_chase_boy = Sequence('소년을 추적', c1, c2, a4)
 
-        root = SEL_chase_or_wander = Selector('추적 또는 배회', SEQ_chase_boy, SEQ_wander)
+        SEQ_runaway_boy = Sequence('도망', a6, c1)
+
+        root = SEL_chase_or_wander = Selector('추적 또는 배회', SEQ_chase_boy, SEQ_runaway_boy, SEQ_wander)
 
         a5 = Action('순찰 위치 가져오기', self.get_patrol_location)
 
         SEQ_patrol = Sequence('순찰', a5, a2)
 
-        SEL_wander_or_chase = Selector('배회 혹은 조건 추적', SEQ_wander, SEQ_chase_boy)
+        SEL_wander_or_chase = Selector('배회 혹은 조건 추적', SEQ_wander, SEQ_runaway_boy, SEQ_chase_boy)
 
         self.bt = BehaviorTree(root)
 
