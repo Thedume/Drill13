@@ -167,3 +167,6 @@ class Zombie:
         SEL_wander_or_chase = Selector('배회 혹은 조건 추적', SEQ_wander, SEQ_chase_boy)
 
         self.bt = BehaviorTree(root)
+
+
+#fin
